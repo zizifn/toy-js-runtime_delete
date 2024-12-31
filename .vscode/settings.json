@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "quickjs.h": "c",
+        "quickjs-libc.h": "c",
+        "test.h": "c",
+        "cutils.h": "c"
+    }
+}
