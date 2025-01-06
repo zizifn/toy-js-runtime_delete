@@ -41,3 +41,8 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/deps/quic
 # Link against the math library
 target_link_libraries(${PROJECT_NAME} PRIVATE m)
 
+# Find and link CURL library
+find_package(CURL REQUIRED)
+target_include_directories(${PROJECT_NAME} PRIVATE ${CURL_INCLUDE_DIRS})
+target_link_libraries(${PROJECT_NAME} PRIVATE ${CURL_LIBRARIES})
+

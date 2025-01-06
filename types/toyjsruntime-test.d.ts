@@ -6,3 +6,8 @@ declare module 'toyjsruntime:test' {
      */
     export function fib(n: number): number;
 }
+
+declare module 'toyjsruntime:net' {
+
+    export function fetch(url: string): Promise<Response>;
+}

@@ -2,7 +2,10 @@
 #include <stdlib.h>
 #include "quickjs.h"
 #include "quickjs-libc.h"
+
 #include "modules/test.h"
+#include "modules/net.h"
+
 #include "cutils.h"
 
 // Add console object setup
@@ -132,6 +135,9 @@ int main(int argc, char **argv)
 
     // add test module
     js_init_module_test(ctx, "toyjsruntime:test");
+
+        // add test module
+    js_init_module_net(ctx, "toyjsruntime:net");
 
     // Pass 1 to eval_file to enable module mode
     if (eval_file(ctx, argv[1], 1))
