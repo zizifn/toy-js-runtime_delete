@@ -26,6 +26,7 @@ set( TOYJSRUNTIME_CMAKE_SOURCES
     ${QUICKJS_SOURCES}
 )
 
+# target
 add_executable( ${PROJECT_NAME} ${TOYJSRUNTIME_CMAKE_SOURCES} )
 
 # Add necessary compiler definitions for QuickJS
