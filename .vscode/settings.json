@@ -4,6 +4,9 @@
         "quickjs-libc.h": "c",
         "test.h": "c",
         "cutils.h": "c",
-        "curl.h": "c"
+        "curl.h": "c",
+        "uv.h": "c",
+        "stdio.h": "c",
+        "cmath": "cpp"
     }
 }
