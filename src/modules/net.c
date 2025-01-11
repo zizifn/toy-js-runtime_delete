@@ -158,13 +158,13 @@ static void idle_fetch_cb(uv_idle_t *handle)
     {
         // Success - resolve promise with response data
         JSValue response_str = JS_NewStringLen(jsctx, response.data, response.size);
-        JS_Call(jsctx, fetch_context->resole_fun, JS_UNDEFINED, 1, &response_str);
+        JS_Call(jsctx, *fetch_context->resole_fun, JS_UNDEFINED, 1, &response_str);
     }
     else
     {
         // Error - reject promise
         JSValue error = JS_NewString(jsctx, curl_easy_strerror(res));
-        JS_Call(jsctx, fetch_context->reject_fun, JS_UNDEFINED, 1, &error);
+        JS_Call(jsctx, *fetch_context->reject_fun, JS_UNDEFINED, 1, &error);
     }
 
     free(response.data);
@@ -172,8 +172,8 @@ static void idle_fetch_cb(uv_idle_t *handle)
 
     uv_idle_stop(handle);
     JS_FreeCString(jsctx, fetch_context->url);
-    JS_FreeValue(jsctx, fetch_context->reject_fun);
-    JS_FreeValue(jsctx, fetch_context->resole_fun);
+    JS_FreeValue(jsctx, *fetch_context->reject_fun);
+    JS_FreeValue(jsctx, *fetch_context->resole_fun);
     free(fetch_context);
 }
 
@@ -182,7 +182,8 @@ static JSValue js_fetch_new(JSContext *ctx, JSValueConst this_val,
 {
     int r;
     uv_idle_t *idle_handle;
-    JSValue promise, resolving_funcs[2];
+    JSValue promise; 
+    JSValue *resolving_funcs = malloc(2 * sizeof(JSValue));
     const char *url;
     fetch_context_struct_t *fetch_context;
 
@@ -201,8 +202,8 @@ static JSValue js_fetch_new(JSContext *ctx, JSValueConst this_val,
     fetch_context = malloc(sizeof(fetch_context_struct_t));
     fetch_context->url = url;
     fetch_context->ctx = ctx;
-    fetch_context->resole_fun = JS_DupValue(ctx, resolving_funcs[0]);
-    fetch_context->reject_fun = JS_DupValue(ctx, resolving_funcs[1]);
+    fetch_context->resole_fun = &resolving_funcs[0];
+    fetch_context->reject_fun = &resolving_funcs[1];
 
     idle_handle = malloc(sizeof(uv_idle_t));
     r = uv_idle_init(uv_default_loop(), idle_handle);
@@ -212,9 +213,6 @@ static JSValue js_fetch_new(JSContext *ctx, JSValueConst this_val,
     idle_handle->data = fetch_context;
     r = uv_idle_start(idle_handle, idle_fetch_cb);
 
-    // JS_FreeCString(ctx, url);
-    JS_FreeValue(ctx, resolving_funcs[0]);
-    JS_FreeValue(ctx, resolving_funcs[1]);
     return promise;
 
 fail:

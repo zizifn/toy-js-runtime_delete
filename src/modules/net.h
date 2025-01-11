@@ -8,8 +8,8 @@ typedef struct context_struct_s
 {
     JSContext *ctx;
     const char *url;
-    JSValue resole_fun;
-    JSValue reject_fun;
+    JSValue *resole_fun;
+    JSValue *reject_fun;
 } fetch_context_struct_t;
 
 // ...existing code...
