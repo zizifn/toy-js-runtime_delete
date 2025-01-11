@@ -11,6 +11,7 @@
         "ncurses.h": "c",
         "interactive_horse_race.h": "c",
         "unistd.h": "c",
-        "stdlib.h": "c"
+        "stdlib.h": "c",
+        "net.h": "c"
     }
 }

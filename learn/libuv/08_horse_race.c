@@ -154,6 +154,7 @@ int main(void)
   srand(time(NULL));
 
   uv_loop_t *loop = uv_default_loop();
+  printf("uv_loop_t %p -----%p \n", loop, uv_default_loop());
 
   if (DRAW)
     init_screen();

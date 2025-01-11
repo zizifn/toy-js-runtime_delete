@@ -26,6 +26,17 @@ set( TOYJSRUNTIME_CMAKE_SOURCES
     ${QUICKJS_SOURCES}
 )
 
+# libs
+# Add libuv submodule
+set(LIBUV_DIR ${CMAKE_SOURCE_DIR}/deps/libuv)
+# Include libuv as a subdirectory
+add_subdirectory(${LIBUV_DIR} ${CMAKE_BINARY_DIR}/libuv)
+
+# Output CURL include directories
+message(STATUS "CMAKE_SOURCE_DIR: ${CMAKE_SOURCE_DIR}")
+message(STATUS "CMAKE_BINARY_DIR: ${CMAKE_BINARY_DIR}")
+
+
 # target
 add_executable( ${PROJECT_NAME} ${TOYJSRUNTIME_CMAKE_SOURCES} )
 
@@ -37,12 +48,17 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
 
 # Include QuickJS headers
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/deps/quickjs)
+target_include_directories(${PROJECT_NAME} PRIVATE ${LIBUV_DIR}/include)
 
 # Link against the math library
 target_link_libraries(${PROJECT_NAME} PRIVATE m)
 
 # Find and link CURL library
 find_package(CURL REQUIRED)
-target_include_directories(${PROJECT_NAME} PRIVATE ${CURL_INCLUDE_DIRS})
-target_link_libraries(${PROJECT_NAME} PRIVATE ${CURL_LIBRARIES})
+target_include_directories(${PROJECT_NAME} PRIVATE ${CURL_INCLUDE_DIRS} )
+target_link_libraries(${PROJECT_NAME} PRIVATE m ${CURL_LIBRARIES} uv)
+
+# Output CURL include directories
+message(STATUS "CURL include directories: ${CURL_INCLUDE_DIRS}")
+
 
