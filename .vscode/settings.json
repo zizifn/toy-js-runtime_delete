@@ -7,6 +7,10 @@
         "curl.h": "c",
         "uv.h": "c",
         "stdio.h": "c",
-        "cmath": "cpp"
+        "cmath": "cpp",
+        "ncurses.h": "c",
+        "interactive_horse_race.h": "c",
+        "unistd.h": "c",
+        "stdlib.h": "c"
     }
 }

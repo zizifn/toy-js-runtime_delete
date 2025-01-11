@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -Wall -g
-LDFLAGS = -luv -lm
+LDFLAGS = -luv -lm -lncurses 
 
 BUILD_DIR = build
 
@@ -25,3 +25,9 @@ all:
 	$(CC) $(CFLAGS) 06_fs_allasync.c -o $(BUILD_DIR)/06_fs_allasync $(LDFLAGS)
 07: 
 	$(CC) $(CFLAGS) 07_tcp_echo_server.c -o $(BUILD_DIR)/07_tcp_echo_server $(LDFLAGS)
+08: 
+	$(CC) $(CFLAGS) 08_horse_race.c -o $(BUILD_DIR)/08_horse_race $(LDFLAGS)
+09: 
+	$(CC) $(CFLAGS) interactive_horse_race/interactive_horse_race.c -o $(BUILD_DIR)/09_horse_race $(LDFLAGS)
+09:
+	$(CC) $(CFLAGS) interactive_horse_race/*.c -o $(BUILD_DIR)/interactive_horse_race $(LDFLAGS)
