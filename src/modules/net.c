@@ -14,18 +14,22 @@ static JSValue js_ping(JSContext *ctx, JSValue this_val, int argc, JSValue *argv
 
 static JSClassID js_response_class_id;
 
+static JSClassDef js_response_class = {
+    "Response",
+    // ...existing code...
+};
+
 static JSValue js_new_response(JSContext *ctx, const char *body, size_t body_len,
                                long status_code, const char *status_text,
                                struct curl_slist *headers)
 {
-    JSValue response_proto, response_obj;
-
-    // Get Response prototype
-    response_proto = JS_GetPropertyStr(ctx, JS_GetGlobalObject(ctx), "Response");
+    JSValue global_obj = JS_GetGlobalObject(ctx);
+    JSValue response_proto = JS_GetPropertyStr(ctx, global_obj, "Response");
+    JS_FreeValue(ctx, global_obj);
     if (JS_IsException(response_proto))
         return JS_EXCEPTION;
 
-    response_obj = JS_NewObjectProtoClass(ctx, response_proto, js_response_class_id);
+    JSValue response_obj = JS_NewObjectProtoClass(ctx, response_proto, js_response_class_id);
 
     // Set response properties
     JS_DefinePropertyValueStr(ctx, response_obj, "ok",
@@ -42,6 +46,7 @@ static JSValue js_new_response(JSContext *ctx, const char *body, size_t body_len
     // Add code to populate headers_obj with headers if necessary
     JS_DefinePropertyValueStr(ctx, response_obj, "headers", headers_obj, JS_PROP_C_W_E);
 
+    JS_FreeValue(ctx, response_proto);
     return response_obj;
 }
 
@@ -133,7 +138,7 @@ fail:
 
 static void idle_fetch_cb(uv_idle_t *handle)
 {
-    fetch_context_struct_t *fetch_context = (fetch_context_struct_t*)handle->data;
+    fetch_context_struct_t *fetch_context = (fetch_context_struct_t *)handle->data;
     JSContext *jsctx = fetch_context->ctx;
     CURL *curl;
     struct curl_response
@@ -147,40 +152,45 @@ static void idle_fetch_cb(uv_idle_t *handle)
     curl_easy_setopt(curl, CURLOPT_URL, fetch_context->url);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteMemoryCallback);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
-   res = curl_easy_perform(curl);
+    res = curl_easy_perform(curl);
 
     if (res == CURLE_OK)
     {
         // Success - resolve promise with response data
         JSValue response_str = JS_NewStringLen(jsctx, response.data, response.size);
-        JS_Call(jsctx, *fetch_context->resole_fun, JS_UNDEFINED, 1, &response_str);
+        JS_Call(jsctx, fetch_context->resole_fun, JS_UNDEFINED, 1, &response_str);
     }
     else
     {
         // Error - reject promise
         JSValue error = JS_NewString(jsctx, curl_easy_strerror(res));
-        JS_Call(jsctx, *fetch_context->reject_fun, JS_UNDEFINED, 1, &error);
+        JS_Call(jsctx, fetch_context->reject_fun, JS_UNDEFINED, 1, &error);
     }
 
     free(response.data);
     curl_easy_cleanup(curl);
 
     uv_idle_stop(handle);
+    JS_FreeCString(jsctx, fetch_context->url);
+    JS_FreeValue(jsctx, fetch_context->reject_fun);
+    JS_FreeValue(jsctx, fetch_context->resole_fun);
+    free(fetch_context);
 }
 
 static JSValue js_fetch_new(JSContext *ctx, JSValueConst this_val,
                             int argc, JSValueConst *argv)
 {
     int r;
-    uv_idle_t idle_handle;
+    uv_idle_t *idle_handle;
     JSValue promise, resolving_funcs[2];
     const char *url;
-    fetch_context_struct_t fetch_context;
+    fetch_context_struct_t *fetch_context;
 
     // Create promise and get resolve/reject functions
     promise = JS_NewPromiseCapability(ctx, resolving_funcs);
     if (JS_IsException(promise))
         goto fail;
+
     if (!JS_IsString(argv[0]))
         return JS_EXCEPTION;
 
@@ -188,19 +198,21 @@ static JSValue js_fetch_new(JSContext *ctx, JSValueConst this_val,
     if (!url)
         return JS_EXCEPTION;
 
-    fetch_context.url = url;
-    fetch_context.ctx = ctx;
-    fetch_context.resole_fun = &resolving_funcs[0];
-    fetch_context.reject_fun = &resolving_funcs[1];
+    fetch_context = malloc(sizeof(fetch_context_struct_t));
+    fetch_context->url = url;
+    fetch_context->ctx = ctx;
+    fetch_context->resole_fun = JS_DupValue(ctx, resolving_funcs[0]);
+    fetch_context->reject_fun = JS_DupValue(ctx, resolving_funcs[1]);
 
-    r = uv_idle_init(uv_default_loop(), &idle_handle);
+    idle_handle = malloc(sizeof(uv_idle_t));
+    r = uv_idle_init(uv_default_loop(), idle_handle);
     if (r)
         goto fail;
 
-    idle_handle.data = &fetch_context;
-    uv_idle_start(&idle_handle, idle_fetch_cb);
-     
-    JS_FreeCString(ctx, url);
+    idle_handle->data = fetch_context;
+    r = uv_idle_start(idle_handle, idle_fetch_cb);
+
+    // JS_FreeCString(ctx, url);
     JS_FreeValue(ctx, resolving_funcs[0]);
     JS_FreeValue(ctx, resolving_funcs[1]);
     return promise;
@@ -212,8 +224,8 @@ fail:
 
 static const JSCFunctionListEntry js_ping_funcs[] = {
     JS_CFUNC_DEF("ping", 0, js_ping),
-    JS_CFUNC_DEF("old-fetch", 0, js_fetch),
-    JS_CFUNC_DEF("fetch", 0, js_fetch_new)};
+    JS_CFUNC_DEF("old_fetch", 1, js_fetch),
+    JS_CFUNC_DEF("fetch", 1, js_fetch_new)};
 
 static int js_net_init(JSContext *ctx, JSModuleDef *m)
 {

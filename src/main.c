@@ -146,7 +146,7 @@ int main(int argc, char **argv)
         cleanup(rt, ctx);
         return 1;
     }
-
+    uv_run(uv_default_loop(), UV_RUN_DEFAULT);
     // Run event loop to process any pending jobs (promises, etc)
     js_std_loop(ctx);
 
