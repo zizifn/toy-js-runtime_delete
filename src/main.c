@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <uv.h>
 #include "quickjs.h"
 #include "quickjs-libc.h"
 
