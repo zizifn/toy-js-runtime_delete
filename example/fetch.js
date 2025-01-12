@@ -15,6 +15,6 @@ resp.then(value => {
 });
 setTimeout(() => {
     console.log("Set time out");
-}, 5000)
+}, 10)
 
 console.log('end!', resp);
