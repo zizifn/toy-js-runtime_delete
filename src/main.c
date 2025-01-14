@@ -95,6 +95,56 @@ void cleanup(JSRuntime *rt, JSContext *ctx)
     JS_FreeRuntime(rt);
 }
 
+static uv_check_t check_handle;
+static uv_prepare_t prepare_handle;
+static uv_idle_t idle_handle;
+static JSContext *g_ctx; // store a reference to use in callback
+
+static void check_cb(uv_check_t *handle) {
+    // printf("check_cb------");
+
+    JSContext *ctx1;
+    int err;
+    while (1) {
+        err = JS_ExecutePendingJob(JS_GetRuntime(g_ctx), &ctx1);
+        printf("check_cb------err is %d\n", err);
+        if (err <= 0) {
+            // if err < 0, an exception occurred
+            break;
+        }
+    }
+}
+
+static void prepare_cb(uv_prepare_t* handle) {
+    printf("prepare_cb\n");
+    // Do nothing, just ensure the loop triggers uv_check
+        JSContext *ctx1;
+    int err;
+    while (1) {
+        err = JS_ExecutePendingJob(JS_GetRuntime(g_ctx), &ctx1);
+        printf("prepare_cb------err is %d\n", err);
+        if (err <= 0) {
+            // if err < 0, an exception occurred
+            break;
+        }
+    }
+}
+
+void idle_cb(uv_idle_t *handle)
+{
+    // JSRuntime *rt = handle->data;
+    // if(JS_IsJobPending(rt)){
+    //     //noop
+    //     printf("idle_cb have JS_IsJobPending");
+    // }else{
+    //     printf("idle_cb have not JS_IsJobPending");
+    //     uv_idle_stop(handle);
+    // }
+
+    printf("idle_cb\n");
+    // noop
+}
+
 int main(int argc, char **argv)
 {
     printf("toy js runtime example\n");
@@ -140,16 +190,36 @@ int main(int argc, char **argv)
         // add test module
     js_init_module_net(ctx, "toyjsruntime:net");
 
+    g_ctx = ctx;
+
+    uv_prepare_init(uv_default_loop(), &prepare_handle);
+    uv_prepare_start(&prepare_handle, prepare_cb);
+
+    uv_check_init(uv_default_loop(), &check_handle);
+    uv_check_start(&check_handle, check_cb);
+
+    // uv_idle_init(uv_default_loop(), &idle_handle);
+    // idle_handle.data = rt;
+
     // Pass 1 to eval_file to enable module mode
     if (eval_file(ctx, argv[1], 1))
     {
         cleanup(rt, ctx);
         return 1;
     }
+    int r;
+    printf("JS_IsJobPending is %d \n", JS_IsJobPending(rt));
+    // do {
+    //     printf("uv_run\n");
+    //     // uv__maybe_idle(qrt);
+    //     uv_idle_start(&idle_handle, idle_cb);
+    //     r = uv_run(uv_default_loop(), UV_RUN_DEFAULT);
+    // } while (r == 0 && JS_IsJobPending(rt));
     uv_run(uv_default_loop(), UV_RUN_DEFAULT);
 
+    printf("JS_IsJobPending is %d \n", JS_IsJobPending(rt));
     // Run event loop to process any pending jobs (promises, etc)
-    js_std_loop(ctx);
+    // js_std_loop(ctx);
 
     JS_FreeValue(ctx, val);
 

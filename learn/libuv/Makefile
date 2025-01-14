@@ -31,3 +31,5 @@ all:
 	$(CC) $(CFLAGS) interactive_horse_race/interactive_horse_race.c -o $(BUILD_DIR)/09_horse_race $(LDFLAGS)
 09:
 	$(CC) $(CFLAGS) interactive_horse_race/*.c -o $(BUILD_DIR)/interactive_horse_race $(LDFLAGS)
+10:
+	$(CC) $(CFLAGS) event_order.c -o $(BUILD_DIR)/event_order $(LDFLAGS)

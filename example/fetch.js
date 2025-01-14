@@ -13,8 +13,8 @@ resp.then(value => {
 }).catch(err =>{
     console.log('promise error', err);
 });
-setTimeout(() => {
-    console.log("Set time out");
-}, 10)
+// setTimeout(() => {
+//     console.log("Set time out");
+// }, 10)
 
 console.log('end!', resp);

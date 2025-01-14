@@ -138,6 +138,8 @@ fail:
 
 static void idle_fetch_cb(uv_idle_t *handle)
 {
+    printf("idle_fetch_cb\n");
+
     fetch_context_struct_t *fetch_context = (fetch_context_struct_t *)handle->data;
     JSContext *jsctx = fetch_context->ctx;
     CURL *curl;
@@ -211,6 +213,7 @@ static JSValue js_fetch_new(JSContext *ctx, JSValueConst this_val,
         goto fail;
 
     idle_handle->data = fetch_context;
+    printf("uv_fetch_idle_start\n");
     r = uv_idle_start(idle_handle, idle_fetch_cb);
 
     return promise;
