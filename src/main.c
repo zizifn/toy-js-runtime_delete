@@ -100,6 +100,8 @@ static uv_prepare_t prepare_handle;
 static uv_idle_t idle_handle;
 static JSContext *g_ctx; // store a reference to use in callback
 
+// execute promise job in check phare is not quite right. but anyway, we just TOY runtime.
+// https://github.com/saghul/txiki.js/issues/684
 static void check_cb(uv_check_t *handle) {
     // printf("check_cb------");
 
@@ -202,9 +204,11 @@ int main(int argc, char **argv)
 
     uv_prepare_init(uv_default_loop(), &prepare_handle);
     uv_prepare_start(&prepare_handle, prepare_cb);
+    uv_unref((uv_handle_t *)&prepare_handle);
 
     uv_check_init(uv_default_loop(), &check_handle);
     uv_check_start(&check_handle, check_cb);
+    uv_unref((uv_handle_t *)&check_handle);
 
     uv_idle_init(uv_default_loop(), &idle_handle);
     uv_idle_start(&idle_handle, idle_cb);
