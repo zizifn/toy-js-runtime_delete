@@ -5,5 +5,5 @@ Toy JS runtime for POC
 
 ### via git submodule
 ```bash
-git submodule add
+git submodule add https://github.com/libuv/libuv.git deps/libuv
 ```

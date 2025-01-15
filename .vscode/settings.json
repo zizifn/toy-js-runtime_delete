@@ -12,6 +12,7 @@
         "interactive_horse_race.h": "c",
         "unistd.h": "c",
         "stdlib.h": "c",
-        "net.h": "c"
+        "net.h": "c",
+        "internal.h": "c"
     }
 }

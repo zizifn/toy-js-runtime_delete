@@ -23,8 +23,8 @@ int main() {
     uv_check_init(loop, &check_req);
     uv_check_start(&check_req, check_cb);
 
-    uv_prepare_init(loop, &prepare_req);
-    uv_prepare_start(&prepare_req, prepare_cb);
+    // uv_prepare_init(loop, &prepare_req);
+    // uv_prepare_start(&prepare_req, prepare_cb);
 
     printf("Before uv_run\n");
     uv_run(loop, UV_RUN_DEFAULT);

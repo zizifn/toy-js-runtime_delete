@@ -113,21 +113,29 @@ static void check_cb(uv_check_t *handle) {
             break;
         }
     }
+
+    //
+    if(JS_IsJobPending(JS_GetRuntime(g_ctx))){
+         printf("check_cb------have JobPending\n");
+    }else{
+        uv_idle_stop(&idle_handle);
+    }
+    
 }
 
 static void prepare_cb(uv_prepare_t* handle) {
-    printf("prepare_cb\n");
-    // Do nothing, just ensure the loop triggers uv_check
-        JSContext *ctx1;
-    int err;
-    while (1) {
-        err = JS_ExecutePendingJob(JS_GetRuntime(g_ctx), &ctx1);
-        printf("prepare_cb------err is %d\n", err);
-        if (err <= 0) {
-            // if err < 0, an exception occurred
-            break;
-        }
-    }
+    // printf("prepare_cb\n");
+    // // Do nothing, just ensure the loop triggers uv_check
+    //     JSContext *ctx1;
+    // int err;
+    // while (1) {
+    //     err = JS_ExecutePendingJob(JS_GetRuntime(g_ctx), &ctx1);
+    //     printf("prepare_cb------err is %d\n", err);
+    //     if (err <= 0) {
+    //         // if err < 0, an exception occurred
+    //         break;
+    //     }
+    // }
 }
 
 void idle_cb(uv_idle_t *handle)
@@ -141,7 +149,7 @@ void idle_cb(uv_idle_t *handle)
     //     uv_idle_stop(handle);
     // }
 
-    printf("idle_cb\n");
+    // printf("idle_cb\n");
     // noop
 }
 
@@ -198,7 +206,8 @@ int main(int argc, char **argv)
     uv_check_init(uv_default_loop(), &check_handle);
     uv_check_start(&check_handle, check_cb);
 
-    // uv_idle_init(uv_default_loop(), &idle_handle);
+    uv_idle_init(uv_default_loop(), &idle_handle);
+    uv_idle_start(&idle_handle, idle_cb);
     // idle_handle.data = rt;
 
     // Pass 1 to eval_file to enable module mode
