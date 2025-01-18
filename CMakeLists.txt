@@ -30,7 +30,11 @@ message(STATUS "CMAKE_SOURCE_DIR: ${CMAKE_SOURCE_DIR}")
 message(STATUS "CMAKE_BINARY_DIR: ${CMAKE_BINARY_DIR}")
 
 # Find and link CURL library via sysytem
+find_package(PkgConfig REQUIRED)
 find_package(CURL REQUIRED)
+
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(GTK4 REQUIRED IMPORTED_TARGET gtk4)
 
 find_library(FFI_LIB NAMES libffi ffi REQUIRED)
 
@@ -39,14 +43,18 @@ find_library(FFI_LIB NAMES libffi ffi REQUIRED)
 # target
 add_executable( ${PROJECT_NAME} ${CMAKE_SOURCE_DIR}/src/main.c ${SRC_FILES} )
 add_executable(testquickjs src/test/main.c ${SRC_FILES})
+add_executable(gtk-test src/test/gtk.c)
 
+#library
 add_library(quickjs-ffi SHARED src/modules/quickjs-ffi.c)
+
 target_link_libraries(quickjs-ffi PRIVATE qjs ${FFI_LIB})
 
 # target_include_directories(${PROJECT_NAME} PRIVATE ${CURL_INCLUDE_DIRS} )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE m ${CURL_LIBRARIES} uv qjs ${FFI_LIB})
 target_link_libraries(testquickjs PRIVATE m ${CURL_LIBRARIES} uv qjs ${FFI_LIB})
+target_link_libraries(gtk-test PRIVATE PkgConfig::GTK4)
 
 # Output CURL include directories
 message(STATUS "CURL include directories: ${CURL_INCLUDE_DIRS}")
