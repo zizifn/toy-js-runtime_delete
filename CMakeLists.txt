@@ -21,6 +21,7 @@ set(LIBUV_DIR ${CMAKE_SOURCE_DIR}/deps/libuv)
 add_subdirectory(${LIBUV_DIR} ${CMAKE_BINARY_DIR}/libuv)
 
 # Add quickjs submodule similarly to libuv
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(QUICKJS_DIR ${CMAKE_SOURCE_DIR}/deps/quickjs)
 set(BUILD_QJS_LIBC ON) # default quickjs CMakeLists is use option to control this
 add_subdirectory(${QUICKJS_DIR} ${CMAKE_BINARY_DIR}/quickjs)
@@ -28,17 +29,24 @@ add_subdirectory(${QUICKJS_DIR} ${CMAKE_BINARY_DIR}/quickjs)
 message(STATUS "CMAKE_SOURCE_DIR: ${CMAKE_SOURCE_DIR}")
 message(STATUS "CMAKE_BINARY_DIR: ${CMAKE_BINARY_DIR}")
 
-# Find and link CURL library
+# Find and link CURL library via sysytem
 find_package(CURL REQUIRED)
+
+find_library(FFI_LIB NAMES libffi ffi REQUIRED)
+
+# libary 
 
 # target
 add_executable( ${PROJECT_NAME} ${CMAKE_SOURCE_DIR}/src/main.c ${SRC_FILES} )
 add_executable(testquickjs src/test/main.c ${SRC_FILES})
 
+add_library(quickjs-ffi SHARED src/modules/quickjs-ffi.c)
+target_link_libraries(quickjs-ffi PRIVATE qjs ${FFI_LIB})
+
 # target_include_directories(${PROJECT_NAME} PRIVATE ${CURL_INCLUDE_DIRS} )
 
-target_link_libraries(${PROJECT_NAME} PRIVATE m ${CURL_LIBRARIES} uv qjs)
-target_link_libraries(testquickjs PRIVATE m ${CURL_LIBRARIES} uv qjs)
+target_link_libraries(${PROJECT_NAME} PRIVATE m ${CURL_LIBRARIES} uv qjs ${FFI_LIB})
+target_link_libraries(testquickjs PRIVATE m ${CURL_LIBRARIES} uv qjs ${FFI_LIB})
 
 # Output CURL include directories
 message(STATUS "CURL include directories: ${CURL_INCLUDE_DIRS}")

@@ -14,6 +14,9 @@
         "stdlib.h": "c",
         "net.h": "c",
         "internal.h": "c",
-        "global.h": "c"
+        "global.h": "c",
+        "limits.h": "c",
+        "ffi.h": "c",
+        "lib-names.h": "c"
     }
 }
