@@ -22,6 +22,8 @@
  * THE SOFTWARE.
  */
 #include "quickjs.h"
+#include <stdlib.h>
+#include "quickjs-libc.h"
 
 #define countof(x) (sizeof(x) / sizeof((x)[0]))
 
@@ -45,8 +47,26 @@ static JSValue js_fib(JSContext *ctx, JSValue this_val,
     return JS_NewInt32(ctx, res);
 }
 
+static JSValue js_callback(JSContext *ctx, JSValue this_val,
+                      int argc, JSValue *argv)
+{
+    JSValue func = argv[0];
+    if (!JS_IsFunction(ctx, func)){
+        return JS_ThrowTypeError(ctx, "not a function");
+    }
+
+    JSValue ret = JS_Call(ctx, func, JS_UNDEFINED, 0, NULL);
+    if (JS_IsException(ret))
+    {
+        js_std_dump_error(ctx);
+        exit(1);
+    }
+    return ret;
+}
+
 static const JSCFunctionListEntry js_fib_funcs[] = {
     JS_CFUNC_DEF("fib", 1, js_fib ),
+     JS_CFUNC_DEF("callback", 1, js_callback ),
 };
 
 static int js_fib_init(JSContext *ctx, JSModuleDef *m)

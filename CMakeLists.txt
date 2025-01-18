@@ -10,13 +10,9 @@ set( TOYJSRUNTIME_CMAKE_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR} )
 
 # Find all source files in src directory and src/modules directory
 file(GLOB SRC_FILES 
-    "${CMAKE_SOURCE_DIR}/src/*.c"
     "${CMAKE_SOURCE_DIR}/src/modules/*.c"
 )
 
-set(TOYJSRUNTIME_CMAKE_SOURCES 
-    ${SRC_FILES}
-)
 
 # libs
 # Add libuv submodule
@@ -36,12 +32,13 @@ message(STATUS "CMAKE_BINARY_DIR: ${CMAKE_BINARY_DIR}")
 find_package(CURL REQUIRED)
 
 # target
-add_executable( ${PROJECT_NAME} ${TOYJSRUNTIME_CMAKE_SOURCES} )
-
+add_executable( ${PROJECT_NAME} ${CMAKE_SOURCE_DIR}/src/main.c ${SRC_FILES} )
+add_executable(testquickjs src/test/main.c ${SRC_FILES})
 
 # target_include_directories(${PROJECT_NAME} PRIVATE ${CURL_INCLUDE_DIRS} )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE m ${CURL_LIBRARIES} uv qjs)
+target_link_libraries(testquickjs PRIVATE m ${CURL_LIBRARIES} uv qjs)
 
 # Output CURL include directories
 message(STATUS "CURL include directories: ${CURL_INCLUDE_DIRS}")

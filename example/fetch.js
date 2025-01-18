@@ -1,7 +1,7 @@
 // import { old_fetch as fetch } from 'toyjsruntime:net';
 import { fetch } from 'toyjsruntime:net';
 
-import { setTimeout } from 'toyjsruntime:os';
+// import { setTimeout } from 'toyjsruntime:os';
 
 const before = new Date().getTime();
 
@@ -13,8 +13,13 @@ resp.then(value => {
 }).catch(err =>{
     console.log('promise error', err);
 });
-// setTimeout(() => {
-//     console.log("Set time out");
-// }, 10)
 
-console.log('end!', resp);
+const result = setTimeout(() => {
+    console.log("setTimeout is 1000---dd--------");
+    return "string";
+})
+
+console.log('setTimeout timeid',  result);
+// setTimeout("xxxxx", 1000)
+
+console.log('end!!!!', resp);

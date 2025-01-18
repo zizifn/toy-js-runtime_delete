@@ -4,8 +4,7 @@
 #include "net.h"
 
 #include "quickjs.h"
-
-#define countof(x) (sizeof(x) / sizeof((x)[0]))
+#include "common.h"
 
 static JSValue js_ping(JSContext *ctx, JSValue this_val, int argc, JSValue *argv)
 {

@@ -1,12 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <uv.h>
 #include "quickjs.h"
 #include "quickjs-libc.h"
 
-#include "modules/test.h"
-#include "modules/net.h"
-#include "modules/global.h"
+#include "../modules/test.h"
+#include "../modules/global.h"
 
 #include "cutils.h"
 
@@ -96,66 +94,6 @@ void cleanup(JSRuntime *rt, JSContext *ctx)
     JS_FreeRuntime(rt);
 }
 
-static uv_check_t check_handle;
-static uv_prepare_t prepare_handle;
-static uv_idle_t idle_handle;
-static JSContext *g_ctx; // store a reference to use in callback
-
-// execute promise job in check phare is not quite right. but anyway, we just TOY runtime.
-// https://github.com/saghul/txiki.js/issues/684
-static void check_cb(uv_check_t *handle) {
-    // printf("check_cb------");
-
-    JSContext *ctx1;
-    int err;
-    while (1) {
-        err = JS_ExecutePendingJob(JS_GetRuntime(g_ctx), &ctx1);
-        printf("check_cb------err is %d\n", err);
-        if (err <= 0) {
-            // if err < 0, an exception occurred
-            break;
-        }
-    }
-
-    //
-    if(JS_IsJobPending(JS_GetRuntime(g_ctx))){
-         printf("check_cb------have JobPending\n");
-    }else{
-        uv_idle_stop(&idle_handle);
-    }
-    
-}
-
-static void prepare_cb(uv_prepare_t* handle) {
-    // printf("prepare_cb\n");
-    // // Do nothing, just ensure the loop triggers uv_check
-    //     JSContext *ctx1;
-    // int err;
-    // while (1) {
-    //     err = JS_ExecutePendingJob(JS_GetRuntime(g_ctx), &ctx1);
-    //     printf("prepare_cb------err is %d\n", err);
-    //     if (err <= 0) {
-    //         // if err < 0, an exception occurred
-    //         break;
-    //     }
-    // }
-}
-
-void idle_cb(uv_idle_t *handle)
-{
-    // JSRuntime *rt = handle->data;
-    // if(JS_IsJobPending(rt)){
-    //     //noop
-    //     printf("idle_cb have JS_IsJobPending");
-    // }else{
-    //     printf("idle_cb have not JS_IsJobPending");
-    //     uv_idle_stop(handle);
-    // }
-
-    // printf("idle_cb\n");
-    // noop
-}
-
 int main(int argc, char **argv)
 {
     printf("toy js runtime example\n");
@@ -186,7 +124,6 @@ int main(int argc, char **argv)
 
     // Initialize standard handlers
     js_std_init_handlers(rt);
-    
 
     JS_SetModuleLoaderFunc(rt, NULL, js_module_loader, NULL);
 
@@ -199,41 +136,12 @@ int main(int argc, char **argv)
     // add test module
     js_init_module_test(ctx, "toyjsruntime:test");
 
-        // add test module
-    js_init_module_net(ctx, "toyjsruntime:net");
-
-    g_ctx = ctx;
-
-    uv_prepare_init(uv_default_loop(), &prepare_handle);
-    uv_prepare_start(&prepare_handle, prepare_cb);
-    uv_unref((uv_handle_t *)&prepare_handle);
-
-    uv_check_init(uv_default_loop(), &check_handle);
-    uv_check_start(&check_handle, check_cb);
-    uv_unref((uv_handle_t *)&check_handle);
-
-    uv_idle_init(uv_default_loop(), &idle_handle);
-    uv_idle_start(&idle_handle, idle_cb);
-    // idle_handle.data = rt;
-
-    // Pass 1 to eval_file to enable module mode
     if (eval_file(ctx, argv[1], 1))
     {
         printf("eval_file failed\n");
         cleanup(rt, ctx);
         return 1;
     }
-    int r;
-    printf("JS_IsJobPending is %d \n", JS_IsJobPending(rt));
-    // do {
-    //     printf("uv_run\n");
-    //     // uv__maybe_idle(qrt);
-    //     uv_idle_start(&idle_handle, idle_cb);
-    //     r = uv_run(uv_default_loop(), UV_RUN_DEFAULT);
-    // } while (r == 0 && JS_IsJobPending(rt));
-    uv_run(uv_default_loop(), UV_RUN_DEFAULT);
-
-    printf("JS_IsJobPending is %d \n", JS_IsJobPending(rt));
     // Run event loop to process any pending jobs (promises, etc)
     // js_std_loop(ctx);
 
