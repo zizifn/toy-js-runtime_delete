@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <uv.h>
+#include "uv.h"
 #include "quickjs.h"
 #include "quickjs-libc.h"
 
@@ -9,6 +9,7 @@
 #include "modules/global.h"
 
 #include "cutils.h"
+#include "modules/utils.h"
 
 // Add console object setup
 
@@ -188,7 +189,7 @@ int main(int argc, char **argv)
     js_std_init_handlers(rt);
     
 
-    JS_SetModuleLoaderFunc(rt, NULL, js_module_loader, NULL);
+    JS_SetModuleLoaderFunc(rt, NULL, js_cutome_module_loader, NULL);
 
     // Add console and other helpers
     js_init_module_std(ctx, "toyjsruntime:std");
@@ -199,8 +200,9 @@ int main(int argc, char **argv)
     // add test module
     js_init_module_test(ctx, "toyjsruntime:test");
 
-        // add test module
+    // add test module
     js_init_module_net(ctx, "toyjsruntime:net");
+    // js_init_module_from_js(ctx, "toyjsruntime:jsmodules");
 
     g_ctx = ctx;
 

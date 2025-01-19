@@ -17,6 +17,7 @@
         "global.h": "c",
         "limits.h": "c",
         "ffi.h": "c",
-        "lib-names.h": "c"
+        "lib-names.h": "c",
+        "gtk.h": "c"
     }
 }

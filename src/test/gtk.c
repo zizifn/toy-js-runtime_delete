@@ -1,4 +1,5 @@
 #include <gtk/gtk.h>
+// #include <glib.h>
 
 static void
 print_hello (GtkWidget *widget,
@@ -32,7 +33,7 @@ main (int    argc,
   GtkApplication *app;
   int status;
 
-  app = gtk_application_new ("org.gtk.example", G_APPLICATION_DEFAULT_FLAGS);
+  app = gtk_application_new ("org.gtk.example", 0);
   g_signal_connect (app, "activate", G_CALLBACK (activate), NULL);
   status = g_application_run (G_APPLICATION (app), argc, argv);
   g_object_unref (app);

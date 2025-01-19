@@ -11,3 +11,11 @@ declare module 'toyjsruntime:net' {
 
     export function fetch(url: string): Promise<Response>;
 }
+
+declare module 'toyjsruntime:jsmodules' {
+    export interface TestObject {
+        obj1: string;
+    }
+    export const obj: TestObject;
+    export function testJSfunction(): string;
+}

@@ -13,6 +13,23 @@ file(GLOB SRC_FILES
     "${CMAKE_SOURCE_DIR}/src/modules/*.c"
 )
 
+# Compile JS files to C using qjsc via make generate_bundles
+file(GLOB BUNDLES_JS "${CMAKE_SOURCE_DIR}/src/bundles/*.js")
+set(GENERATED_C_FILES "")
+foreach(js_file ${BUNDLES_JS})
+    get_filename_component(js_name ${js_file} NAME_WE)
+    set(c_file "${CMAKE_SOURCE_DIR}/src/bundles/${js_name}.c")
+    add_custom_command(
+        OUTPUT ${c_file}
+        COMMAND ${CMAKE_BINARY_DIR}/quickjs/qjsc -o ${c_file} ${js_file}
+        DEPENDS ${js_file} ${CMAKE_SOURCE_DIR}/build/quickjs/qjsc
+        COMMENT "Compiling ${js_file} to ${c_file}"
+    )
+    list(APPEND GENERATED_C_FILES ${c_file})
+endforeach()
+
+# Create custom target for generating bundles
+add_custom_target(generate_bundles DEPENDS ${GENERATED_C_FILES})
 
 # libs
 # Add libuv submodule
@@ -33,7 +50,6 @@ message(STATUS "CMAKE_BINARY_DIR: ${CMAKE_BINARY_DIR}")
 find_package(PkgConfig REQUIRED)
 find_package(CURL REQUIRED)
 
-find_package(PkgConfig REQUIRED)
 pkg_check_modules(GTK4 REQUIRED IMPORTED_TARGET gtk4)
 
 find_library(FFI_LIB NAMES libffi ffi REQUIRED)
@@ -58,5 +74,6 @@ target_link_libraries(gtk-test PRIVATE PkgConfig::GTK4)
 
 # Output CURL include directories
 message(STATUS "CURL include directories: ${CURL_INCLUDE_DIRS}")
+message(STATUS "GTK4 include directories: ${GTK4_INCLUDE_DIRS}")
 
 
