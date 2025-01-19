@@ -21,6 +21,12 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wall"
+#pragma GCC diagnostic ignored "-Wdiscarded-qualifiers"
+#pragma GCC diagnostic ignored "-Wstringop-overflow="
+
+// #pragma GCC diagnostic ignored "-Wnote"
 
 #define _GNU_SOURCE
 #include <dlfcn.h>
@@ -741,7 +747,7 @@ static int init(JSContext *ctx, JSModuleDef *m) {
     return 0;
 }
 
-JSModuleDef *js_init_module(JSContext *ctx, const char *module_name) {
+JSModuleDef *js_init_module_ffi(JSContext *ctx, const char *module_name) {
     JSModuleDef *m;
     m = JS_NewCModule(ctx, module_name, init);
     if (!m)
@@ -752,3 +758,5 @@ JSModuleDef *js_init_module(JSContext *ctx, const char *module_name) {
     JS_AddModuleExport(ctx, m, "stderr");
     return m;
 }
+
+#pragma GCC diagnostic pop

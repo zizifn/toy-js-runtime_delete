@@ -18,6 +18,8 @@
         "limits.h": "c",
         "ffi.h": "c",
         "lib-names.h": "c",
-        "gtk.h": "c"
+        "gtk.h": "c",
+        "getopt_compat.h": "c",
+        "utils.h": "c"
     }
 }

@@ -18,4 +18,5 @@ declare module 'toyjsruntime:jsmodules' {
     }
     export const obj: TestObject;
     export function testJSfunction(): string;
+    export function testFetch(): Promise<void>;
 }

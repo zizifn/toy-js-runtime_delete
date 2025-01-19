@@ -10,6 +10,7 @@
 
 #include "cutils.h"
 #include "modules/utils.h"
+#include "modules/quickjs-ffi.h"
 
 // Add console object setup
 
@@ -153,7 +154,7 @@ void idle_cb(uv_idle_t *handle)
     //     uv_idle_stop(handle);
     // }
 
-    // printf("idle_cb\n");
+    printf("idle_cb\n");
     // noop
 }
 
@@ -199,10 +200,11 @@ int main(int argc, char **argv)
 
     // add test module
     js_init_module_test(ctx, "toyjsruntime:test");
+    js_init_module_ffi(ctx, "toyjsruntime:ffi");
+
 
     // add test module
     js_init_module_net(ctx, "toyjsruntime:net");
-    // js_init_module_from_js(ctx, "toyjsruntime:jsmodules");
 
     g_ctx = ctx;
 

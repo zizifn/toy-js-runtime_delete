@@ -5,6 +5,7 @@ project (toyjsruntime C)
 set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Build type" FORCE)
 set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -O0 -g")
 
+
 set( TOYJSRUNTIME_CMAKE_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR} )
 set( TOYJSRUNTIME_CMAKE_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR} )
 
@@ -13,7 +14,7 @@ file(GLOB SRC_FILES
     "${CMAKE_SOURCE_DIR}/src/modules/*.c"
 )
 
-# Compile JS files to C using qjsc via make generate_bundles
+# Compile JS files to C  via make generate_bundles
 file(GLOB BUNDLES_JS "${CMAKE_SOURCE_DIR}/src/bundles/*.js")
 set(GENERATED_C_FILES "")
 foreach(js_file ${BUNDLES_JS})
@@ -21,7 +22,7 @@ foreach(js_file ${BUNDLES_JS})
     set(c_file "${CMAKE_SOURCE_DIR}/src/bundles/${js_name}.c")
     add_custom_command(
         OUTPUT ${c_file}
-        COMMAND ${CMAKE_BINARY_DIR}/quickjs/qjsc -o ${c_file} ${js_file}
+        COMMAND ${CMAKE_BINARY_DIR}/toyjsruntimec -o ${c_file} ${js_file}
         DEPENDS ${js_file} ${CMAKE_SOURCE_DIR}/build/quickjs/qjsc
         COMMENT "Compiling ${js_file} to ${c_file}"
     )
@@ -57,20 +58,23 @@ find_library(FFI_LIB NAMES libffi ffi REQUIRED)
 # libary 
 
 # target
-add_executable( ${PROJECT_NAME} ${CMAKE_SOURCE_DIR}/src/main.c ${SRC_FILES} )
+add_executable( toyjsruntime ${CMAKE_SOURCE_DIR}/src/main.c ${SRC_FILES} )
+add_executable(toyjsruntimec ${CMAKE_SOURCE_DIR}/src/toyjsc.c ${SRC_FILES} )
 add_executable(testquickjs src/test/main.c ${SRC_FILES})
-add_executable(gtk-test src/test/gtk.c)
+
+# only fot test
+# add_executable(gtk-test src/test/gtk.c)
 
 #library
-add_library(quickjs-ffi SHARED src/modules/quickjs-ffi.c)
-
-target_link_libraries(quickjs-ffi PRIVATE qjs ${FFI_LIB})
-
+# add_library(quickjs-ffi SHARED src/modules/quickjs-ffi.c)
+# target_link_libraries(quickjs-ffi PRIVATE qjs ${FFI_LIB})
 # target_include_directories(${PROJECT_NAME} PRIVATE ${CURL_INCLUDE_DIRS} )
 
-target_link_libraries(${PROJECT_NAME} PRIVATE m ${CURL_LIBRARIES} uv qjs ${FFI_LIB})
+target_link_libraries(toyjsruntime PRIVATE m ${CURL_LIBRARIES} uv qjs ${FFI_LIB})
+target_link_libraries(toyjsruntimec PRIVATE m ${CURL_LIBRARIES} uv qjs ${FFI_LIB})
+
 target_link_libraries(testquickjs PRIVATE m ${CURL_LIBRARIES} uv qjs ${FFI_LIB})
-target_link_libraries(gtk-test PRIVATE PkgConfig::GTK4)
+# target_link_libraries(gtk-test PRIVATE PkgConfig::GTK4)
 
 # Output CURL include directories
 message(STATUS "CURL include directories: ${CURL_INCLUDE_DIRS}")
