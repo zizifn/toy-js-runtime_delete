@@ -66,7 +66,8 @@ add_executable(testquickjs src/test/main.c ${SRC_FILES})
 # add_executable(gtk-test src/test/gtk.c)
 
 #library
-# add_library(quickjs-ffi SHARED src/modules/quickjs-ffi.c)
+add_library(test_lib SHARED example/ffi/test-lib.c)
+
 # target_link_libraries(quickjs-ffi PRIVATE qjs ${FFI_LIB})
 # target_include_directories(${PROJECT_NAME} PRIVATE ${CURL_INCLUDE_DIRS} )
 

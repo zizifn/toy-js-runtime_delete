@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-import * as ffi from '../../build/libquickjs-ffi.so';
+import * as ffi from 'toyjsruntime:ffi';
 
 const dlCache = {}; // {'filename': {handle: ..., symbols: {'...': ...}}}
 

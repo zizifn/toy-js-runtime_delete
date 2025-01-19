@@ -1,6 +1,7 @@
 #include "quickjs.h"
 #include "quickjs-libc.h"
 #include "../bundles/jsmodule.c"
+#include "../bundles/quickjs-ffi.c"
 
 typedef struct
 {
@@ -10,7 +11,9 @@ typedef struct
 } builtin_js_t;
 
 static builtin_js_t builtins[] = {
-    {"toyjsruntime:jsmodules", qjsc_jsmodule, qjsc_jsmodule_size}};
+    {"toyjsruntime:jsmodules", qjsc_jsmodule, qjsc_jsmodule_size},
+    {"toyjsruntime:jsffi", qjsc_quickjs_ffi,qjsc_quickjs_ffi_size}
+    };
 
 JSModuleDef *js_cutome_module_loader(JSContext *ctx,
                                      const char *module_name, void *opaque)

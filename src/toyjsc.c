@@ -395,6 +395,7 @@ int main(int argc, char **argv)
     namelist_add(&cmodule_list, "bjson", "bjson", 0);
 
     namelist_add(&cmodule_list, "toyjsruntime:net", "net", 0);
+    namelist_add(&cmodule_list, "toyjsruntime:ffi", "ffi", 0);
 
 
     for(;;) {
