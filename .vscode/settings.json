@@ -20,6 +20,7 @@
         "lib-names.h": "c",
         "gtk.h": "c",
         "getopt_compat.h": "c",
-        "utils.h": "c"
+        "utils.h": "c",
+        "common.h": "c"
     }
 }

@@ -11,8 +11,10 @@
 #include "cutils.h"
 #include "modules/utils.h"
 #include "modules/quickjs-ffi.h"
+#include "modules/common.h"
 
 // Add console object setup
+
 
 static int eval_buf(JSContext *ctx, const void *buf, int buf_len,
                     const char *filename, int eval_flags)
@@ -112,7 +114,7 @@ static void check_cb(uv_check_t *handle) {
     int err;
     while (1) {
         err = JS_ExecutePendingJob(JS_GetRuntime(g_ctx), &ctx1);
-        printf("check_cb------err is %d\n", err);
+        LOG_DEBUG("check_cb------err is %d\n", err);
         if (err <= 0) {
             // if err < 0, an exception occurred
             break;
@@ -121,7 +123,7 @@ static void check_cb(uv_check_t *handle) {
 
     //
     if(JS_IsJobPending(JS_GetRuntime(g_ctx))){
-         printf("check_cb------have JobPending\n");
+         LOG_DEBUG("check_cb------have JobPending\n");
     }else{
         uv_idle_stop(&idle_handle);
     }
@@ -154,16 +156,16 @@ void idle_cb(uv_idle_t *handle)
     //     uv_idle_stop(handle);
     // }
 
-    printf("idle_cb\n");
+    LOG_DEBUG("idle_cb\n");
     // noop
 }
 
 int main(int argc, char **argv)
 {
-    printf("toy js runtime example\n");
+    LOG_DEBUG("toy js runtime example\n");
     if (argc != 2)
     {
-        printf("Usage: %s <javascript-file>\n", argv[0]);
+        LOG_DEBUG("Usage: %s <javascript-file>\n", argv[0]);
         return 1;
     }
 
@@ -223,12 +225,12 @@ int main(int argc, char **argv)
     // Pass 1 to eval_file to enable module mode
     if (eval_file(ctx, argv[1], 1))
     {
-        printf("eval_file failed\n");
+        LOG_DEBUG("eval_file failed\n");
         cleanup(rt, ctx);
         return 1;
     }
     int r;
-    printf("JS_IsJobPending is %d \n", JS_IsJobPending(rt));
+    LOG_DEBUG("JS_IsJobPending is %d \n", JS_IsJobPending(rt));
     // do {
     //     printf("uv_run\n");
     //     // uv__maybe_idle(qrt);
@@ -237,7 +239,7 @@ int main(int argc, char **argv)
     // } while (r == 0 && JS_IsJobPending(rt));
     uv_run(uv_default_loop(), UV_RUN_DEFAULT);
 
-    printf("JS_IsJobPending is %d \n", JS_IsJobPending(rt));
+    LOG_DEBUG("JS_IsJobPending is %d \n", JS_IsJobPending(rt));
     // Run event loop to process any pending jobs (promises, etc)
     // js_std_loop(ctx);
 

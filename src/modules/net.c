@@ -212,7 +212,7 @@ static JSValue js_fetch_new(JSContext *ctx, JSValueConst this_val,
         goto fail;
 
     idle_handle->data = fetch_context;
-    printf("uv_fetch_idle_start\n");
+    LOG_DEBUG("uv_fetch_idle_start\n");
     r = uv_idle_start(idle_handle, idle_fetch_cb);
 
     return promise;

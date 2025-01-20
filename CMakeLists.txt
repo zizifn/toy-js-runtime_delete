@@ -2,8 +2,8 @@ cmake_minimum_required (VERSION 3.10)
 
 project (toyjsruntime C)
 
-set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Build type" FORCE)
-set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -O0 -g")
+# set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Build type" FORCE)
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -O0 -g -DDEBUG")
 
 
 set( TOYJSRUNTIME_CMAKE_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR} )

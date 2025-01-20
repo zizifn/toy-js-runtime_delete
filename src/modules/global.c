@@ -15,18 +15,18 @@ void js_os_setTimeout_cb(uv_timer_t *handle)
 {
     int r;
     JSValue ret, func;
-    printf("js_os_setTimeout_cb\n");
+    LOG_DEBUG("js_os_setTimeout_cb\n");
     timer_context_struct_t *context = (timer_context_struct_t *)handle->data;
     // func = JS_DupValue(context->ctx, context->func);
     ret = JS_Call(context->ctx, context->func, JS_UNDEFINED, 0, NULL);
     if (JS_IsException(ret))
     {
-        printf("js_os_setTimeout_cb exception\n");
+        LOG_ERROR("js_os_setTimeout_cb exception\n");
         js_std_dump_error(context->ctx);
         exit(1);
     }
     
-    printf("js_os_setTimeout_cb res: %s \n", JS_ToCString(context->ctx, ret));
+    LOG_DEBUG("js_os_setTimeout_cb res: %s \n", JS_ToCString(context->ctx, ret));
     JS_FreeValue(context->ctx, ret);
     free(context);
 }
